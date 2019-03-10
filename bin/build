@@ -2,8 +2,25 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-ROOT="$(pwd)"
-export GOPATH="$ROOT/go"
-mkdir -p "$GOPATH"
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 pkg version" >&2
+  exit 1
+fi
 
-exec go get -v github.com/minio/minio github.com/minio/mc
+PKG="$1"
+VERSION="$2"
+
+ROOT="$(pwd)"
+BUILD_DIR="$ROOT/build"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+
+export GO111MODULE=off
+export GOPATH="$BUILD_DIR"
+go get -d "$PKG"
+
+cd "$BUILD_DIR/src/$PKG"
+git -c advice.detachedHead=false checkout -f "$VERSION"
+
+cd "$BUILD_DIR"
+go install "$PKG"
