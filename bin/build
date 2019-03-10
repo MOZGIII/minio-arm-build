@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+ROOT="$(pwd)"
+export GOPATH="$ROOT/go"
+mkdir -p "$GOPATH"
+
+exec go get -v github.com/minio/minio github.com/minio/mc
